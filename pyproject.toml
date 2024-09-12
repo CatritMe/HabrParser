@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "habrparser"
+version = "0.1.0"
+description = ""
+authors = ["CatritMe"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+requests-futures = "^1.0.1"
+dateparser = "^1.2.0"
+beautifulsoup4 = "^4.12.3"
+psycopg2-binary = "^2.9.9"
+sqlalchemy = "^2.0.34"
+python-dotenv = "^1.0.1"
+asyncpg = "^0.29.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
