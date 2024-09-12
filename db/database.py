@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.orm import sessionmaker, Session
 
 from db.meta import metadata, Article, Author, Hab
-from habr_parser import get_info, get_links, print_info
+from habr_parser import get_info, print_info
 
 load_dotenv()
 
@@ -46,7 +46,7 @@ def create_db(db_name='habrs'):
     connection = psycopg2.connect(user=username, password=password)
     connection.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
     cursor = connection.cursor()
-    cursor.execute(f"drop database {db_name}")
+    # cursor.execute(f"drop database {db_name}")
     cursor.execute(f'create database {db_name}')
     cursor.close()
     connection.close()
@@ -61,37 +61,7 @@ def create_table() -> Session:
     return Session(bind=engine)
 
 
-def insert_data(links, hab, hab_title):
-    """
-    Первичная вставка спарсенных данных в БД
-    Ничего не возвращает
-    """
-    with session() as s:
-        hab = Hab(title=hab_title, link=hab)
-        art_list = []
-        for link in links:
-            url_article, title, date, author_name, author_url = get_info(link)
-            query_author = (select(Author).filter_by(name=author_name))
-            auth = s.execute(query_author)
-            aut = auth.unique().scalars().first()
-            if aut is None:
-                author = Author(name=author_name, link=author_url)
-                article = Article(title=title, date=date, link=url_article)
-                author.articles = [article]
-                art_list.append(article)
-                s.add(author)
-                print_info(hab_title, hab, title, date, author_name, author_url, url_article)
-            else:
-                article = Article(title=title, date=date, link=url_article, author=aut)
-                art_list.append(article)
-                print_info(hab_title, hab, title, date, author_name, author_url, url_article)
-                s.add(article)
-        hab.articles = art_list
-        s.add(hab)
-        s.commit()
-
-
-async def update_data(links, hab, hab_title):
+async def insert_and_update_data(links, hab, hab_title):
     """
     Обновление информации в БД
     Ничего не возвращает, выводит в консоль информацию о новых статьях, добавленных в БД"""
@@ -138,9 +108,6 @@ async def update_data(links, hab, hab_title):
 def main():
     create_db()
     create_table()
-    # hab = 'https://habr.com/ru/hubs/infosecurity/articles/'
-    # links, hab_title = get_links(hab)
-    # insert_data(links, hab, hab_title)
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 import asyncio
 import datetime
 
-from db.database import update_data
+from db.database import insert_and_update_data
 from habr_parser import get_links
 
 # наиболее популярные хабы в разделе "разработка":
@@ -16,7 +16,7 @@ async def main():
     while True:
         for hab in habs:
             links, hab_title = get_links(hab)
-            await update_data(links, hab, hab_title)
+            await insert_and_update_data(links, hab, hab_title)
         print(f'парсинг в {datetime.datetime.now()}')
         await asyncio.sleep(600)  # 10 минут
 
